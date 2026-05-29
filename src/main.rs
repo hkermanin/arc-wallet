@@ -1,14 +1,13 @@
 use anyhow::Result;
-use dotenvy::dotenv;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use std::env;
 use uuid::Uuid;
 
+use crate::config::arc_config;
 use crate::encrypt::ciphertext;
 
 mod encrypt;
-
+mod config;
 
 
 #[derive(Serialize)]
@@ -38,17 +37,14 @@ struct WalletSet {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    dotenv().ok();
 
-    let api_key = env::var("CIRCLE_API_KEY")?;
-    let entity_secret = env::var("ENTITY_SECRET")?;
+    let config = arc_config().await?;
 
+    let ciphertext: String = ciphertext(&config.public_key, &config.entity_secret)?;
 
     let client = Client::new();
 
-    let ciphertext = ciphertext(&api_key, &entity_secret).await?;
 
-    println!("{:?}", ciphertext);
 
     let body = CreateWalletSetRequest {
         idempotencyKey: Uuid::new_v4().to_string(),
@@ -60,7 +56,7 @@ async fn main() -> Result<()> {
 
     let response = client
         .post("https://api.circle.com/v1/w3s/developer/walletSets")
-        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Authorization", format!("Bearer {}", &config.api_key))
         .json(&body)
         .send()
         .await?;
