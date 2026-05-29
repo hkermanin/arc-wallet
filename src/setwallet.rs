@@ -1,6 +1,6 @@
 use anyhow::Result;
 use reqwest::Client;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::config::Config;
@@ -33,8 +33,7 @@ pub struct WalletSet {
     pub name: String,
 }
 
-pub async fn create_set_wallet(name: &str, client: &Client, config: &Config) -> Result<WalletSet>{
-
+pub async fn create_set_wallet(name: &str, client: &Client, config: &Config) -> Result<WalletSet> {
     let ciphertext = ciphertext(&config.public_key, &config.entity_secret)?;
 
     let body = CreateWalletSetRequest {

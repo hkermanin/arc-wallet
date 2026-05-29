@@ -1,8 +1,8 @@
-use std::env;
 use anyhow::Result;
-use reqwest::Client;
-use serde::{Deserialize};
 use dotenvy::dotenv;
+use reqwest::Client;
+use serde::Deserialize;
+use std::env;
 
 pub struct Config {
     pub api_key: String,
@@ -21,8 +21,7 @@ struct PublicKeyData {
     public_key: String,
 }
 
-
-pub async fn arc_config(client: &Client) -> Result<Config>{
+pub async fn arc_config(client: &Client) -> Result<Config> {
     dotenv().ok();
 
     let api_key = env::var("CIRCLE_API_KEY")?;
@@ -36,10 +35,10 @@ pub async fn arc_config(client: &Client) -> Result<Config>{
 
     let res: PublicKeyResponse = response.json().await?;
 
-    let config = Config{
+    let config = Config {
         api_key,
         entity_secret,
-        public_key : res.data.public_key,
+        public_key: res.data.public_key,
     };
 
     Ok(config)
