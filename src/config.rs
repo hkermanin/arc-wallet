@@ -22,13 +22,12 @@ struct PublicKeyData {
 }
 
 
-pub async fn arc_config() -> Result<Config>{
+pub async fn arc_config(client: &Client) -> Result<Config>{
     dotenv().ok();
 
     let api_key = env::var("CIRCLE_API_KEY")?;
     let entity_secret = env::var("ENTITY_SECRET")?;
 
-    let client = Client::new();
     let response = client
         .get("https://api.circle.com/v1/w3s/config/entity/publicKey")
         .header("Authorization", format!("Bearer {}", api_key))
